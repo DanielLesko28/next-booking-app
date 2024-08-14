@@ -12,16 +12,50 @@ export const createProfileAction = async (
 ) => {
   try {
     const user = await currentUser();
-    console.log("user", user);
+
+    if (!user) throw new Error("Please login to create a profile");
 
     const rawData = Object.fromEntries(formData);
     const validatedFields = profileSchema.parse(rawData);
-    console.log("validatedFields", validatedFields);
+    await db.profile.create({
+      data: {
+        clerkId: user.id,
+        email: user.emailAddresses[0].emailAddress,
+        profileImage: user.imageUrl ?? "",
+        ...validatedFields,
+      },
+    });
 
-    return { message: "Profile created" };
+    await clerkClient.users.updateUserMetadata(user.id, {
+      privateMetadata: {
+        hasProfile: true,
+      },
+    });
+
+    // return { message: "Profile created" };
   } catch (error) {
     console.log("Error in createProfileAction");
 
-    return { message: "There was an Error" };
+    return {
+      message: error instanceof Error ? error.message : "There was an Error",
+    };
   }
+  redirect("/");
+};
+
+export const fetchProfileImage = async () => {
+  const user = await currentUser();
+
+  if (!user) return null;
+
+  const profile = await db.profile.findUnique({
+    where: {
+      clerkId: user.id,
+    },
+    select: {
+      profileImage: true,
+    },
+  });
+
+  return profile?.profileImage;
 };
