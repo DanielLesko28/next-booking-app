@@ -109,6 +109,8 @@ export const updateProfileAction = async (
       data: validatedFields,
     });
     revalidatePath("/profile");
+    //redirect is not working
+    // redirect("/");
     return { message: "Profile updated succesfully" };
   } catch (error) {
     console.log("Error in updateProfileAction", error);
