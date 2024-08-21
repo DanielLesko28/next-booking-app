@@ -14,7 +14,10 @@ export const profileSchema = z.object({
   }),
 });
 
-export function validateWithZodSchema<T>(schema: ZodSchema, data: unknown): T {
+export function validateWithZodSchema<T>(
+  schema: ZodSchema<T>,
+  data: unknown
+): T {
   // const validatedFields = profileSchema.parse(rawData);
   const result = schema.safeParse(data);
 
