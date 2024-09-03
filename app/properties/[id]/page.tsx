@@ -1,7 +1,15 @@
+import { fetchPropertyDetail } from "@/utils/actions";
+import { redirect } from "next/navigation";
 import React from "react";
 
-const page = () => {
-  return <div>Property</div>;
-};
+async function PropertyDetailsPage({ params }: { params: { id: string } }) {
+  const property = await fetchPropertyDetail(params.id);
+  if (!property) redirect("/");
 
-export default page;
+  const { baths, bedrooms, beds, guests } = property;
+  const details = { baths, bedrooms, beds, guests };
+
+  return <div>page</div>;
+}
+
+export default PropertyDetailsPage;
