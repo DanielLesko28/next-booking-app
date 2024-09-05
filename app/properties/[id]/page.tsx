@@ -1,3 +1,4 @@
+import BreadCrumbs from "@/components/properties/BreadCrumbs";
 import { fetchPropertyDetail } from "@/utils/actions";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -9,7 +10,11 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
   const { baths, bedrooms, beds, guests } = property;
   const details = { baths, bedrooms, beds, guests };
 
-  return <div>page</div>;
+  return (
+    <section>
+      <BreadCrumbs name={property.name} />
+    </section>
+  );
 }
 
 export default PropertyDetailsPage;
