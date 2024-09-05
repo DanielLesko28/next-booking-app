@@ -12,6 +12,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { uploadImage } from "./supabase";
 
+//Action for Authorization
 const getAuthUser = async () => {
   const user = await currentUser();
 
@@ -33,6 +34,7 @@ const renderError = (error: unknown): { message: string } => {
   };
 };
 
+//Actions for Profile
 export const createProfileAction = async (
   prevState: any,
   formData: FormData
@@ -156,6 +158,7 @@ export const updateProfileImageAction = async (
   //   return { message: "Profile image updated successfully" };
 };
 
+//Actions for Properties
 export const createPropertyAction = async (
   prevState: any,
   formData: FormData
@@ -215,6 +218,18 @@ export const fetchProperties = async ({
   return properties;
 };
 
+export const fetchPropertyDetails = async (id: string) => {
+  return db.property.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      profile: true,
+    },
+  });
+};
+
+//Actions for Favorites
 export const fetchFavoriteId = async ({
   propertyId,
 }: {
@@ -288,13 +303,20 @@ export const toggleFavoriteAction = async (prevState: {
   }
 };
 
-export const fetchPropertyDetails = async (id: string) => {
-  return db.property.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      profile: true,
-    },
-  });
+//Actions for Reviews
+
+export const createReviewAction = async () => {
+  return { message: "create review" };
+};
+
+export const fetchPropertyReviews = async () => {
+  return { message: "fetch reviews" };
+};
+
+export const fetchPropertyReviewsByUser = async () => {
+  return { message: "fetch user reviews" };
+};
+
+export const deleteReviewAction = async () => {
+  return { message: "delete  reviews" };
 };
