@@ -288,7 +288,7 @@ export const toggleFavoriteAction = async (prevState: {
   }
 };
 
-export const fetchPropertyDetail = async (id: string) => {
+export const fetchPropertyDetails = async (id: string) => {
   return db.property.findUnique({
     where: {
       id,
