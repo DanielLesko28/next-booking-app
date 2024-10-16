@@ -9,7 +9,7 @@ async function PropertyReviews({ propertyId }: { propertyId: string }) {
     <div className="mt-8">
       <Title text="Reviews" />
       <div className="grid md:grid-cols-2 gap-8 mt-4 ">
-        {reviews.map((review) => {
+        {reviews.map((review: any) => {
           const { comment, rating } = review;
           const { firstName, profileImage } = review.profile;
           const reviewInfo = {
