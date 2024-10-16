@@ -14,6 +14,7 @@ import dynamic from "next/dynamic";
 import { Skeleton } from "@/components/ui/skeleton";
 
 import { auth } from "@clerk/nextjs/server";
+import SubmitReview from "@/components/reviews/SubmitReview";
 const DynamicMap = dynamic(
   () => import("@/components/properties/PropertyMap"),
   {
@@ -75,6 +76,7 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
       {/* after two column section */}
       {/* {reviewDoesNotExist && <SubmitReview propertyId={property.id} />}
       <PropertyReviews propertyId={property.id} /> */}
+      <SubmitReview propertyId={property.id} />
     </section>
   );
 }
