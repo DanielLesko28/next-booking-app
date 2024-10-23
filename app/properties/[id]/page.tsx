@@ -16,6 +16,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { auth } from "@clerk/nextjs/server";
 import SubmitReview from "@/components/reviews/SubmitReview";
 import PropertyReviews from "@/components/reviews/PropertyReviews";
+
 const DynamicMap = dynamic(
   () => import("@/components/properties/PropertyMap"),
   {
@@ -24,13 +25,13 @@ const DynamicMap = dynamic(
   }
 );
 
-// const DynamicBookingWrapper = dynamic(
-//   () => import("@/components/booking/BookingWrapper"),
-//   {
-//     ssr: false,
-//     loading: () => <Skeleton className="h-[200px] w-full" />,
-//   }
-// );
+const DynamicBookingWrapper = dynamic(
+  () => import("@/components/booking/BookingWrapper"),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[200px] w-full" />,
+  }
+);
 
 async function PropertyDetailsPage({ params }: { params: { id: string } }) {
   const property = await fetchPropertyDetails(params.id);
@@ -72,11 +73,11 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
         </div>
         <div className="lg:col-span-4 flex flex-col items-center">
           {/* calendar */}
-          {/* <DynamicBookingWrapper
+          <DynamicBookingWrapper
             propertyId={property.id}
             price={property.price}
             bookings={property.bookings}
-          /> */}
+          />
         </div>
       </section>
       {/* after two column section */}
