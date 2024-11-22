@@ -84,7 +84,6 @@ async function PropertyDetailsPage({ params }: { params: { id: string } }) {
       {reviewDoesNotExist && <SubmitReview propertyId={property.id} />}
       <PropertyReviews propertyId={property.id} />
       <SubmitReview propertyId={property.id} />
-      <PropertyReviews propertyId={property.id} />
     </section>
   );
 }
