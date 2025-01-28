@@ -18,6 +18,7 @@ function BookingCalendar() {
   const [range, setRange] = useState<DateRange | undefined>(defaultSelected);
 
   const bookings = useProperty((state) => state.bookings);
+
   const blockedPeriods: DateRange[] | [] = generateBlockedPeriods({
     bookings,
     today: currentDate,

@@ -18,7 +18,10 @@ import { calculateTotals } from "./calculateTotals";
 const getAuthUser = async () => {
   const user = await currentUser();
 
-  //   console.log("user", user);
+  console.log(
+    "user",
+    `First name: ${user?.firstName} and Last name: ${user?.lastName}`
+  );
 
   if (!user) {
     throw new Error("You must be logged in to access this route");
@@ -439,12 +442,12 @@ export const createBookingAction = async (prevState: {
   checkOut: Date;
 }) => {
   const user = await getAuthUser();
-  await db.booking.deleteMany({
-    where: {
-      profileId: user.id,
-      paymentStatus: false,
-    },
-  });
+  // await db.booking.deleteMany({
+  //   where: {
+  //     profileId: user.id,
+  //     paymentStatus: false,
+  //   },
+  // });
   let bookingId: null | string = null;
 
   const { propertyId, checkIn, checkOut } = prevState;
@@ -477,4 +480,239 @@ export const createBookingAction = async (prevState: {
     return renderError(error);
   }
   redirect(`/checkout?bookingId=${bookingId}`);
+};
+
+export const fetchBookings = async () => {
+  const user = await getAuthUser();
+  const bookings = await db.booking.findMany({
+    where: {
+      profileId: user.id,
+    },
+    include: {
+      property: {
+        select: {
+          id: true,
+          name: true,
+          country: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+
+  return bookings;
+};
+
+export async function deleteBookingAction(prevState: { bookingId: string }) {
+  const { bookingId } = prevState;
+  const user = await getAuthUser();
+
+  try {
+    const result = await db.booking.delete({
+      where: {
+        id: bookingId,
+        profileId: user.id,
+      },
+    });
+
+    revalidatePath("/bookings");
+    return { message: "Booking deleted successfully" };
+  } catch (error) {
+    return renderError(error);
+  }
+}
+
+//Rentals functionality
+export const fetchRentals = async () => {
+  const user = await getAuthUser();
+  const rentals = await db.property.findMany({
+    where: {
+      profileId: user.id,
+    },
+    select: {
+      id: true,
+      name: true,
+      price: true,
+    },
+  });
+
+  const rentalsWithBookingSums = await Promise.all(
+    rentals.map(async (rental) => {
+      const totalNightsSum = await db.booking.aggregate({
+        where: {
+          propertyId: rental.id,
+          paymentStatus: true,
+        },
+        _sum: {
+          totalNights: true,
+        },
+      });
+
+      const orderTotalSum = await db.booking.aggregate({
+        where: {
+          propertyId: rental.id,
+          paymentStatus: true,
+        },
+        _sum: {
+          orderTotal: true,
+        },
+      });
+
+      return {
+        ...rental,
+        totalNightsSum: totalNightsSum._sum.totalNights,
+        orderTotalSum: orderTotalSum._sum.orderTotal,
+      };
+    })
+  );
+
+  return rentalsWithBookingSums;
+};
+
+export const deleteRentalAction = async (prevState: { propertyId: string }) => {
+  const { propertyId } = prevState;
+
+  const user = await getAuthUser();
+
+  try {
+    await db.property.delete({
+      where: {
+        id: propertyId,
+        profileId: user.id,
+      },
+    });
+
+    revalidatePath("/rentals");
+
+    return { message: " Rental deleted successfully" };
+  } catch (e) {
+    return renderError(e);
+  }
+};
+
+export const fetchRentalDetails = async (propertyId: string) => {
+  const user = await getAuthUser();
+
+  return db.property.findUnique({
+    where: { id: propertyId, profileId: user.id },
+  });
+};
+
+export const updatePropertyAction = async (
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> => {
+  "use server";
+  const user = await getAuthUser();
+  const propertyId = formData.get("id") as string;
+
+  try {
+    const rawData = Object.fromEntries(formData);
+    const validatedFields = validateWithZodSchema(propertySchema, rawData);
+    await db.property.update({
+      where: {
+        id: propertyId,
+        profileId: user.id,
+      },
+      data: {
+        ...validatedFields,
+      },
+    });
+
+    revalidatePath(`/rentals`);
+    // redirect("/rentals");
+    // revalidatePath(`/rentals/${propertyId}/edit`);
+
+    // return { message: "Update Successfull !!!" };
+  } catch (error) {
+    console.log('Error in updatePropertyAction",');
+    return renderError(error);
+  }
+  redirect("/rentals");
+};
+
+export const updatePropertyImageAction = async (
+  prevState: any,
+  formData: FormData
+): Promise<{ message: string }> => {
+  const user = await getAuthUser();
+  const propertyId = formData.get("id") as string;
+
+  try {
+    const image = formData.get("image") as File;
+    const validatedFields = validateWithZodSchema(imageSchema, { image });
+    const fullPath = await uploadImage(validatedFields.image);
+
+    await db.property.update({
+      where: {
+        id: propertyId,
+        profileId: user.id,
+      },
+      data: {
+        image: fullPath,
+      },
+    });
+    revalidatePath(`/rentals/${propertyId}/edit`);
+    return { message: "Property Image Updated Successful" };
+  } catch (error) {
+    return renderError(error);
+  }
+};
+
+//Reservations functionality
+export const fetchReservations = async () => {
+  const user = await getAuthUser();
+
+  const reservations = await db.booking.findMany({
+    where: {
+      // paymentStatus: true,
+      property: {
+        profileId: user.id,
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      property: {
+        select: {
+          id: true,
+          name: true,
+          price: true,
+          country: true,
+        },
+      },
+    },
+  });
+  return reservations;
+};
+
+export const fetchReservationStats = async () => {
+  const user = await getAuthUser();
+
+  const properties = await db.property.count({
+    where: {
+      profileId: user.id,
+    },
+  });
+
+  const totals = await db.booking.aggregate({
+    _sum: {
+      orderTotal: true,
+      totalNights: true,
+    },
+    where: {
+      property: {
+        profileId: user.id,
+      },
+    },
+  });
+
+  return {
+    properties,
+    nights: totals._sum.totalNights || 0,
+    amount: totals._sum.orderTotal || 0,
+  };
 };

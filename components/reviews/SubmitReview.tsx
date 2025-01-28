@@ -6,9 +6,14 @@ import { Card } from "@/components/ui/card";
 import RatingInput from "../form/RatingInput";
 import TextAreaInput from "@/components/form/TextAreaInput";
 import { Button } from "@/components/ui/button";
-import { createReviewAction } from "@/utils/actions";
+import { createReviewAction, fetchProfile } from "@/utils/actions";
 function SubmitReview({ propertyId }: { propertyId: string }) {
   const [isReviewFormVisible, setIsReviewFormVisible] = useState(false);
+
+  // const profile = await fetchProfile();
+
+  // console.log("profile in submiting review", profile);
+
   return (
     <div className="mt-8">
       <Button onClick={() => setIsReviewFormVisible((prev) => !prev)}>
