@@ -29,6 +29,29 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
+## Variables for .env file
+
+DB_PASSWORD
+
+DATABASE_URL
+DIRECT_URL
+
+SUPABASE_URL
+SUPABASE_KEY
+
+ADMIN_USER_ID
+
+## Variables for .env.local file
+
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
+CLERK_SECRET_KEY
+
+NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL=/profile/create
+NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL=/profile/create
+NEXT_PUBLIC_WEBSITE_URL=http://localhost:3000/
+
+SUPABASE_DB_PASSWORD
+
 ## Deploy on Vercel
 
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
