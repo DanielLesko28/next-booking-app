@@ -34,7 +34,10 @@ const DynamicBookingWrapper = dynamic(
 );
 
 async function PropertyDetailsPage({ params }: { params: { id: string } }) {
+  // console.log("params and id", params);
   const property = await fetchPropertyDetails(params.id);
+
+  // console.log("Params", params.id, "property", property);
   if (!property) redirect("/");
   const { baths, bedrooms, beds, guests } = property;
   const details = { baths, bedrooms, beds, guests };

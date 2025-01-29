@@ -177,6 +177,8 @@ export const createPropertyAction = async (
 ): Promise<{ message: string }> => {
   const user = await getAuthUser();
 
+  // console.log("user in creating property action", user);
+
   try {
     const rawData = Object.fromEntries(formData);
     const file = formData.get("image") as File;
@@ -320,6 +322,23 @@ export const toggleFavoriteAction = async (prevState: {
     return renderError(error);
   }
 };
+
+// export const fetchPropertyDetails = async (id: string) => {
+//   return db.property.findUnique({
+//     where: {
+//       id,
+//     },
+//     include: {
+//       profile: true,
+//       bookings: {
+//         select: {
+//           checkIn: true,
+//           checkOut: true,
+//         },
+//       },
+//     },
+//   });
+// };
 
 //Actions for Reviews
 
